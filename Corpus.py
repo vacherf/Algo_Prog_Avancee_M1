@@ -48,6 +48,11 @@ class Corpus:
 # =============================================================================
         
     def creationGraphe(self, docs):
+        options = {
+            'node_color': 'blue',
+            'node_size': 100,
+            'width': 3,
+        }
         stop_words = get_stop_words('en')
         stop_words = stop_words + ['robotic', 'robotics']
         G = nx.Graph()
@@ -89,11 +94,11 @@ class Corpus:
             if G.degree[noeud] < 1:
                 G.remove_node(noeud)
         pos=nx.spring_layout(G)
-        nx.draw(G,pos)
+        nx.draw(G,pos, node_size=[len(word) * 300 for word in G.nodes()], node_color='black')
         # specifiy edge labels explicitly
         edge_labels=dict([((u,v,),d['weight'])
         for u,v,d in G.edges(data=True)])
         nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
-        nx.draw_networkx_labels(G, pos, font_size=10)
+        nx.draw_networkx_labels(G, pos, font_size=10, font_color='white')
         # show graphs
         plt.show()

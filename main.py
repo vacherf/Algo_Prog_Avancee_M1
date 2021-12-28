@@ -79,7 +79,7 @@ top_posts = reddit.subreddit(theme).top('all',limit=nbResultReddit)
 for post in top_posts:
     docs.append(('Reddit', post))
 
-nbResultArxiv = 6
+nbResultArxiv = 5
 
 url = 'http://export.arxiv.org/api/query?search_query=all:' + theme + '&start=0&max_results=' + str(nbResultArxiv)
 data = urllib.request.urlopen(url)
