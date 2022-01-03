@@ -5,11 +5,10 @@ from Corpus import Corpus
 import urllib.request
 import xmltodict
 from dateutil.parser import parse
-import pickle
 from datetime import datetime
 import praw
-import re
 # import pandas
+from Fenetre import Fenetre
 
 # Dictionnaire ayant comme clé un id et comme valeur le titre du document
 id2doc = {}
@@ -160,4 +159,5 @@ corp = Corpus('Corpus 1', authors, id2aut, id2doc)
 # =============================================================================
 # print(collection)
 # =============================================================================
-corp.creationGraphe(collection)
+
+fen = Fenetre(collection)
