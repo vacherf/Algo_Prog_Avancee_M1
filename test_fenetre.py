@@ -16,7 +16,7 @@ def recup_valeurs():
     valeur=s.get()
 entree = Entry(fenetre, width=30)
 entree.pack()
-s = Spinbox(fenetre, from_=0, to=10)
+s = Spinbox(fenetre, from_=1, to=100)
 s.pack()
 bouton=Button(fenetre, text="Valider", command=recup_valeurs)
 bouton.pack()

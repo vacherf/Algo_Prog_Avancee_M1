@@ -10,6 +10,7 @@ import praw
 # import pandas
 from Fenetre import Fenetre
 
+
 # Dictionnaire ayant comme clé un id et comme valeur le titre du document
 id2doc = {}
 idDoc = 0

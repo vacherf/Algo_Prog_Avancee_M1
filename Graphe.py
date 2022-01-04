@@ -1,13 +1,19 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from stop_words import get_stop_words
+import pickle
 
 class Graphe():
+    # G -> graphe
+    # docs -> documents
+    # poidsMin -> poids mininum des arêtes à afficher
     
-    def __init__(self, docs):
+    def __init__(self, docs, poidsMin):
         stop_words = get_stop_words('en')
         stop_words = stop_words + ['robotic', 'robotics']
-        G = nx.Graph()
+        self.G = nx.Graph()
+        self.docs = docs
+        self.poidsMin = poidsMin
         for doc in docs:
             # Suppression des points dans le texte
             txt = doc.texte.replace(".","")
@@ -26,27 +32,53 @@ class Graphe():
                     for j in range(i,len(txtClean)):
                         if(txtClean[i].lower() != txtClean[j].lower()):
                             try:
-                                G[txtClean[i].lower()][txtClean[j].lower()]['weight'] += 1
+                                self.G[txtClean[i].lower()][txtClean[j].lower()]['weight'] += 1
                             except KeyError:     
-                                G.add_edge(txtClean[i].lower(), txtClean[j].lower(), weight=1)
+                                self.G.add_edge(txtClean[i].lower(), txtClean[j].lower(), weight=1)
                                 
-        aretes = list(G.edges(data='weight'))
+        aretes = list(self.G.edges(data='weight'))
         for mot1,mot2,poids in aretes:
-            if poids <= 30:
-                G.remove_edge(mot1, mot2)
-        noeuds = list(G.nodes)
+            if poids <= int(poidsMin):
+                self.G.remove_edge(mot1, mot2)
+        noeuds = list(self.G.nodes)
         for noeud in noeuds:
-            if G.degree[noeud] < 1:
-                G.remove_node(noeud)       
+            if self.G.degree[noeud] < 1:
+                self.G.remove_node(noeud)  
+        print(self.G)
+        self.dessinerGraphe()
         
-        pos=nx.spring_layout(G)
-        nx.draw(G,pos, node_size=[len(word) * 300 for word in G.nodes()], node_color='black')
-        # specifiy edge labels explicitly
+    def rechercheMot(self, mot):
+        if mot != "":
+            aretes = list(self.G.edges(data='weight'))
+            for mot1, mot2, poids in aretes:
+                if mot1 != mot and mot2 != mot:
+                    # Suppression des arêtes inutiles
+                    self.G.remove_edge(mot1, mot2)
+                elif poids <= int(self.poidsMin):
+                    self.G.remove_edge(mot1, mot2)
+            noeuds = list(self.G.nodes)
+            for noeud in noeuds:
+                if self.G.degree[noeud] < 1:
+                    # Suppression des noeuds inutiles
+                    self.G.remove_node(noeud)   
+        else:
+            self.__init__(self.docs, self.poidsMin)
+        self.dessinerGraphe()
+        
+    def dessinerGraphe(self):
+        pos=nx.spring_layout(self.G)
+        # Taille des noeuds en fonction de la taille du mot
+        nx.draw(self.G,pos, node_size=[len(word) * 300 for word in self.G.nodes()], node_color='black')
+        
         edge_labels=dict([((u,v,),d['weight'])
-        for u,v,d in G.edges(data=True)])
-        nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
-        nx.draw_networkx_labels(G, pos, font_size=10, font_color='white')
+        for u,v,d in self.G.edges(data=True)])
+        # Ecriture des poids
+        nx.draw_networkx_edge_labels(self.G,pos,edge_labels=edge_labels)
+        # Ecriture des mots
+        nx.draw_networkx_labels(self.G, pos, font_size=10, font_color='white')
         # Sauvegarde du graphe
-        
         plt.savefig('fig.png', dpi=300)
         plt.show(block=True)
+        
+    
+            
