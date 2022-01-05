@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from stop_words import get_stop_words
-import pickle
 
 class Graphe():
     # G -> graphe
@@ -9,32 +8,21 @@ class Graphe():
     # poidsMin -> poids mininum des arêtes à afficher
     
     def __init__(self, docs, poidsMin):
-        stop_words = get_stop_words('en')
-        stop_words = stop_words + ['robotic', 'robotics']
         self.G = nx.Graph()
         self.docs = docs
         self.poidsMin = poidsMin
         for doc in docs:
-            # Suppression des points dans le texte
-            txt = doc.texte.replace(".","")
-            txtSplit = txt.split()
-            txtClean = []
-            for indice in range(len(txtSplit)):
-                try:
-                    ind = stop_words.index(txtSplit[indice].lower())
-                except ValueError:
-                    ind = -1
-                # Suppression des "stop-words"
-                if(ind == -1):
-                    txtClean.append(txtSplit[indice])
-            if(len(txtClean) != 0):
-                for i in range(len(txtClean)):
-                    for j in range(i,len(txtClean)):
-                        if(txtClean[i].lower() != txtClean[j].lower()):
+            # Traitement sur le texte
+            texte = self.traiterTexte(doc)
+            lgTexte = len(texte)
+            if(lgTexte != 0):
+                for i in range(lgTexte):
+                    for j in range(i,lgTexte):
+                        if(texte[i].lower() != texte[j].lower()):
                             try:
-                                self.G[txtClean[i].lower()][txtClean[j].lower()]['weight'] += 1
+                                self.G[texte[i].lower()][texte[j].lower()]['weight'] += 1
                             except KeyError:     
-                                self.G.add_edge(txtClean[i].lower(), txtClean[j].lower(), weight=1)
+                                self.G.add_edge(texte[i].lower(), texte[j].lower(), weight=1)
                                 
         aretes = list(self.G.edges(data='weight'))
         for mot1,mot2,poids in aretes:
@@ -44,10 +32,27 @@ class Graphe():
         for noeud in noeuds:
             if self.G.degree[noeud] < 1:
                 self.G.remove_node(noeud)  
-        print(self.G)
         self.dessinerGraphe()
         
-    def rechercheMot(self, mot):
+    def traiterTexte(self, texte):
+        txt = texte
+        caracSpe = ['.', '(', ')', ',', '\n']
+        for carac in caracSpe:
+            txt = txt.replace(carac, ' ')
+        # Suppression des "stop-words"
+        stop_words = get_stop_words('en')
+        # Ajout de certains mots et caractères
+        stop_words = stop_words + ['robotic', 'robotics', 'ie', 'also', 'e', '-', '!', '?']
+        txtSplit = txt.split()
+        txtClean = []
+        for indice in range(len(txtSplit)):
+            try:
+                stop_words.index(txtSplit[indice].lower())
+            except ValueError:
+                txtClean.append(txtSplit[indice])
+        return txtClean
+        
+    def rechercherMot(self, mot):
         if mot != "":
             aretes = list(self.G.edges(data='weight'))
             for mot1, mot2, poids in aretes:
