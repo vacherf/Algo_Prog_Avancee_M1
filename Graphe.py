@@ -73,7 +73,7 @@ class Graphe():
     def dessinerGraphe(self):
         pos=nx.spring_layout(self.G)
         # Taille des noeuds en fonction de la taille du mot
-        nx.draw(self.G,pos, node_size=[len(word) * 300 for word in self.G.nodes()], node_color='black')
+        nx.draw(self.G,pos, node_size=[len(word) * 400 for word in self.G.nodes()], node_color='black')
         
         edge_labels=dict([((u,v,),d['weight'])
         for u,v,d in self.G.edges(data=True)])

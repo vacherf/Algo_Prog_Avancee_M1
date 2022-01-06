@@ -4,15 +4,21 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from Graphe import Graphe
 import pickle
+from tkinter.filedialog import askopenfilename, asksaveasfilename
+
 
 class Application():
     # fenetre -> fenetre principale
     # collection -> tous les documents
     # G -> graphe
+    # nbDocReddit -> nombre de documents venant de Reddit à traiter
+    # nbDocArxiv -> nombre de documents venant de Arxiv à traiter
 
     def __init__(self):
-        self.reddit = RedditDocuments(5)
-        self.arxiv = ArxivDocuments(5)
+        self.nbDocReddit = 5
+        self.nbDocArxiv = 5
+        self.reddit = RedditDocuments(self.nbDocReddit)
+        self.arxiv = ArxivDocuments(self.nbDocArxiv)
         self.collection = self.reddit.documents + self.arxiv.documents
         # Poids minimal par défaut
         self.poids = 30
@@ -39,10 +45,25 @@ class Application():
     def actionGraphe(self):
         frameAction = tk.Frame(self.fenetre)
         frameAction.pack()
-        labelAction = tk.LabelFrame(frameAction, text="Rafraichissement du graphe en cas de bug", padx=20, pady=20)
+        labelAction = tk.LabelFrame(frameAction, text="Rafraichissement du graphe en cas de bug d'affichage (superposition des noeuds)", padx=20, pady=20)
         labelAction.pack(fill="both", expand="yes")
         btn = tk.Button(labelAction, text='Rafraichir', command=self.rafraichir)
         btn.pack()
+
+        labelChoix = tk.LabelFrame(frameAction, text="Choix du nombre de documents", padx=20, pady=20)
+        labelChoix.pack(fill="both", expand="yes")
+        tk.Label(labelChoix, text="Entrez le nombre de documents Reddit souhaités").pack()
+        redditDefaut = tk.StringVar(self.fenetre)
+        redditDefaut.set(self.nbDocReddit)
+        self.docreddit = tk.Spinbox(labelChoix, from_=0, to=30, textvariable=redditDefaut)
+        self.docreddit.pack()
+        tk.Label(labelChoix, text="Entrez le nombre de documents Arxiv souhaités").pack()
+        arxivDefaut = tk.StringVar(self.fenetre)
+        arxivDefaut.set(self.nbDocArxiv)
+        self.docarxiv = tk.Spinbox(labelChoix, from_=0, to=30, textvariable=arxivDefaut)
+        self.docarxiv.pack()
+        bouton = tk.Button(labelChoix, text="Valider", command=self.choixNombreDocuments)
+        bouton.pack()
 
         labelMot = tk.LabelFrame(frameAction, text="Recherche de mot", padx=20, pady=20)
         labelMot.pack(fill="both", expand="yes")
@@ -55,7 +76,6 @@ class Application():
         labelPoids = tk.LabelFrame(frameAction, text="Selection du poids minimal", padx=20, pady=20)
         labelPoids.pack(fill="both", expand="yes")
         tk.Label(labelPoids, text="Veuillez choisir la valeur de poids minimal").pack()
-        tk.Label(labelPoids, text="(valeur par défaut : 30)").pack()
         poidsDefaut = tk.StringVar(self.fenetre)
         poidsDefaut.set(self.poids)
         self.poidsSx = tk.Spinbox(labelPoids, from_=1, to=100, textvariable=poidsDefaut)
@@ -69,6 +89,13 @@ class Application():
         
     def rafraichir(self):
         self.G.dessinerGraphe()
+        self.chargerImage()
+
+    def choixNombreDocuments(self):
+        self.reddit = RedditDocuments(int(self.docreddit.get()))
+        self.arxiv = ArxivDocuments(int(self.docarxiv.get()))
+        self.collection = self.reddit.documents + self.arxiv.documents
+        self.G = Graphe(self.collection, self.poids)
         self.chargerImage()
     
     def recherche(self):
@@ -94,11 +121,13 @@ class Application():
         self.chargerImage()
         
     def sauvegarderGraphe(self):
-        with open("./graphe.pkl", "wb") as f:
+        filepath = asksaveasfilename(title="Sauvegarder", filetypes=[('pickle files', '.pkl'), ('all files', '.*')])
+        with open(filepath + ".pkl", "wb") as f:
             pickle.dump(self.G, f)
         
     def restaurerGraphe(self):
-        with open("./graphe.pkl", "rb") as f:
+        filepath = askopenfilename(title="Charger une sauvegarde", filetypes=[('pickle files', '.pkl'), ('all files', '.*')])
+        with open(filepath, "rb") as f:
             self.G = pickle.load(f)
         self.G.dessinerGraphe()
         self.chargerImage()
