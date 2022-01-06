@@ -96,5 +96,6 @@ class Graphe():
         nx.draw_networkx_labels(self.G, pos, font_size=10, font_color='white')
         # Sauvegarde du graphe
         plt.savefig('fig.png', dpi=300)
+        plt.show(block=True)
     
             
