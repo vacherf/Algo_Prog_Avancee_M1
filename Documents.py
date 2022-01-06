@@ -42,6 +42,7 @@ class ArxivDocuments(Documents):
         
     def recuperationDocuments(self):
         docsTmp = xmltodict.parse(self.data)['feed']['entry']
+        # S'il y a 1 document, docTmp prend la forme d'un document, sinon d'une liste
         if(self.nbDocuments == 1):
             self.documents.append(docsTmp['summary'])
         else:
