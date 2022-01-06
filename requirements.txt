@@ -1,0 +1,8 @@
+matplotlib=3.5.0=py38haa95532_0
+networkx=2.6.3=pyhd3eb1b0_0
+pickleshare=0.7.5=pyhd3eb1b0_1003
+pillow=8.0.0=py38hca74424_0
+praw=7.0.0=py_0
+stop-words=2018.7.23=pyh9f0ad1d_0
+urllib3=1.25.11=py_0
+xmltodict=0.12.0=py_0
