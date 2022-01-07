@@ -8,19 +8,25 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 
 class Application():
-    # fenetre -> fenetre principale
-    # collection -> tous les documents
-    # G -> graphe
     # nbDocReddit -> nombre de documents venant de Reddit à traiter
     # nbDocArxiv -> nombre de documents venant de Arxiv à traiter
+    # poids -> poids minimal des arêtes à afficher
+    # collection -> tous les documents Reddit et Arxiv réunis
+    # G -> graphe
+    # fenetre -> fenetre principale
+    # img -> label contenant l'image du graphe
+    # docReddit -> spinbox permettant le choix du nombre de documents Reddit
+    # docArxiv -> spinbox permettant le choix du nombre de documents Arxiv
+    # rechercheMot -> zone de texte afin d'entrer un mot à chercher
+    # poidsSx -> spinbox permettant le choix du poids minimal à afficher
 
     def __init__(self):
         # Initialisation du nombre de documents à 5 pour les deux sources de données
         self.nbDocReddit = 5
         self.nbDocArxiv = 5
-        self.reddit = RedditDocuments(self.nbDocReddit)
-        self.arxiv = ArxivDocuments(self.nbDocArxiv)
-        self.collection = self.reddit.documents + self.arxiv.documents
+        reddit = RedditDocuments(self.nbDocReddit)
+        arxiv = ArxivDocuments(self.nbDocArxiv)
+        self.collection = reddit.documents + arxiv.documents
         # Poids minimal par défaut
         self.poids = 30
         self.G = Graphe(self.collection, self.poids)
@@ -65,13 +71,13 @@ class Application():
         redditDefaut = tk.StringVar(self.fenetre)
         redditDefaut.set(self.nbDocReddit)
         # Création du spinbox permettant le chox du nombre de documents souhaités
-        self.docreddit = tk.Spinbox(labelChoix, from_=0, to=30, textvariable=redditDefaut)
-        self.docreddit.pack()
+        self.docReddit = tk.Spinbox(labelChoix, from_=0, to=30, textvariable=redditDefaut)
+        self.docReddit.pack()
         tk.Label(labelChoix, text="Entrez le nombre de documents Arxiv souhaités").pack()
         arxivDefaut = tk.StringVar(self.fenetre)
         arxivDefaut.set(self.nbDocArxiv)
-        self.docarxiv = tk.Spinbox(labelChoix, from_=0, to=30, textvariable=arxivDefaut)
-        self.docarxiv.pack()
+        self.docArxiv = tk.Spinbox(labelChoix, from_=0, to=30, textvariable=arxivDefaut)
+        self.docArxiv.pack()
         bouton = tk.Button(labelChoix, text="Valider", command=self.choixNombreDocuments)
         bouton.pack()
         
@@ -107,9 +113,9 @@ class Application():
 
     def choixNombreDocuments(self):
         # Création d'une nouvelle collection en fonction des valeurs saisies par l'utilisateur
-        self.reddit = RedditDocuments(int(self.docreddit.get()))
-        self.arxiv = ArxivDocuments(int(self.docarxiv.get()))
-        self.collection = self.reddit.documents + self.arxiv.documents
+        reddit = RedditDocuments(int(self.docReddit.get()))
+        arxiv = ArxivDocuments(int(self.docArxiv.get()))
+        self.collection = reddit.documents + arxiv.documents
         self.G = Graphe(self.collection, self.poids)
         self.chargerImage()
     
@@ -121,10 +127,10 @@ class Application():
         # Image contenant le graphe précedemment créé
         image = Image.open('./fig.png')
         # Hauteur de l'image en fonction de la taille de l'écran
-        self.hauteurImg = int(self.fenetre.winfo_screenheight()) - 100
+        hauteurImg = int(self.fenetre.winfo_screenheight()) - 100
         # Largeur de l'image en fonction de la hauteur de l'image afin d'éviter une déformation de celle-ci
-        self.largeurImg = int((float(image.size[0]) * self.hauteurImg) / float(image.size[1]))
-        image = image.resize((self.largeurImg, self.hauteurImg), Image.ANTIALIAS)
+        largeurImg = int((float(image.size[0]) * hauteurImg) / float(image.size[1]))
+        image = image.resize((largeurImg, hauteurImg), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(image)
         # Implantation de l'image dans le label
         self.img.configure(image=photo)
