@@ -25,6 +25,7 @@ class Application():
         self.poids = 30
         self.G = Graphe(self.collection, self.poids)
         self.fenetre = tk.Tk()
+        self.fenetre.title("Projet algorithmique et programmation avancée - PONSON - VACHER")
         # Agrandissement de la fenêtre au maximum
         self.fenetre.wm_state('zoomed')
         # Affichage du graphe obtenu
